@@ -1,0 +1,114 @@
+<section class="dashboard">
+  <header class="page-heading">
+    <div>
+      <p class="eyebrow">NETWORK OVERVIEW</p>
+      <h1>Wi-Fi dashboard</h1>
+      <p class="subtitle">Monitor your connection and explore coverage across your space.</p>
+    </div>
+    <span class="connection-status" [class.online]="wifi.companionConnected()">
+      <span aria-hidden="true"></span>
+      @if (wifi.companionConnected()) {
+        Companion connected
+      } @else {
+        Companion disconnected
+      }
+    </span>
+  </header>
+
+  <section class="network-card" aria-labelledby="network-title">
+    <div class="card-heading">
+      <div>
+        <p class="eyebrow">CONNECTED WI-FI</p>
+        <h2 id="network-title">
+          @if (!wifi.companionConnected()) {
+            Waiting for companion
+          } @else if (wifi.reading()?.connected && !wifi.reading()?.ssid) {
+            Network name unavailable
+          } @else if (wifi.reading()?.connected) {
+            {{ wifi.reading()?.ssid }}
+          } @else {
+            No Wi-Fi connection
+          }
+        </h2>
+      </div>
+      @if (wifi.reading()?.connected && wifi.reading()?.channel) {
+        <span class="band">Channel {{ wifi.reading()?.channel }}</span>
+      }
+    </div>
+    <div class="signal-reading">
+      @if (wifi.reading()?.connected && wifi.reading()?.rssiDbm !== null && wifi.reading()?.rssiDbm !== undefined) {
+        <strong>{{ wifi.reading()?.rssiDbm }} <span>dBm</span></strong>
+        <span class="quality">{{ signalQuality() }}</span>
+      } @else {
+        <strong>— <span>dBm</span></strong>
+        <span class="quality">No live signal</span>
+      }
+    </div>
+    <div class="signal-meter" role="meter" aria-label="Wi-Fi signal strength" aria-valuemin="-100" aria-valuemax="-20" [attr.aria-valuenow]="wifi.reading()?.rssiDbm">
+      <span [style.width.%]="signalPercent()"></span>
+    </div>
+    @if (estimatedDistance(); as distance) {
+      <app-distance-graphic [meters]="distance" />
+    }
+    @if (wifi.reading()?.error) {
+      <p class="sample-note">{{ wifi.reading()?.error }}</p>
+    } @else if (wifi.reading()?.connected && wifi.reading()?.timestamp) {
+      <p class="sample-note">Live reading · updated {{ wifi.reading()?.timestamp | date:'mediumTime' }}</p>
+    } @else {
+      <p class="sample-note">
+        {{ wifi.reading()?.error || wifi.companionError() || 'No active Wi-Fi connection.' }}
+      </p>
+    }
+  </section>
+
+  <section class="provider-card" aria-labelledby="provider-title">
+    <div>
+      <p class="eyebrow">INTERNET PROVIDER</p>
+      <h2 id="provider-title">
+        @if (provider()) {
+          Connected via {{ provider() }}
+        } @else {
+          Provider not checked
+        }
+      </h2>
+      <p class="sample-note">
+        Optional lookup: IPinfo receives your public IP address and returns the network organization
+        associated with it. The result is an ASN-based estimate, not your Wi-Fi name or always your
+        retail ISP. The token stays in the local companion.
+        <a href="https://ipinfo.io/lite" target="_blank" rel="noopener noreferrer">About IPinfo Lite</a>
+      </p>
+    </div>
+    <button
+      type="button"
+      class="provider-button"
+      [disabled]="providerLookupInProgress()"
+      (click)="lookupProvider()"
+    >
+      {{ providerLookupInProgress() ? 'Checking…' : provider() ? 'Check again' : 'Look up provider' }}
+    </button>
+    @if (providerLookupStatus()) {
+      <p class="provider-status" role="status" aria-live="polite">{{ providerLookupStatus() }}</p>
+    }
+  </section>
+
+  <section class="quick-actions" aria-label="Explore Wi-Fi tools">
+    <a class="feature-card" routerLink="/coverage-map">
+      <span class="card-icon" aria-hidden="true">⌁</span>
+      <h2>Coverage map</h2>
+      <p>View estimated signal coverage across your floor plan.</p>
+      <span class="card-action">Open map <span aria-hidden="true">→</span></span>
+    </a>
+    <a class="feature-card" routerLink="/wifi-monitor">
+      <span class="card-icon" aria-hidden="true">⌁</span>
+      <h2>Wi-Fi monitor</h2>
+      <p>Review connection details and recent signal readings.</p>
+      <span class="card-action">View monitor <span aria-hidden="true">→</span></span>
+    </a>
+    <a class="feature-card" routerLink="/mesh-simulator">
+      <span class="card-icon" aria-hidden="true">⌘</span>
+      <h2>Mesh simulator</h2>
+      <p>Explore router and mesh-node placement scenarios.</p>
+      <span class="card-action">Open simulator <span aria-hidden="true">→</span></span>
+    </a>
+  </section>
+</section>

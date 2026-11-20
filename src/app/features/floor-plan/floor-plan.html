@@ -1,0 +1,92 @@
+<section class="editor-page">
+  <header class="page-heading">
+    <div>
+      <p class="eyebrow">VERSION 1 · LAYOUT EDITOR</p>
+      <h1>Floor plan & coverage</h1>
+      <p class="subtitle">Arrange devices and walls to see an estimated Wi-Fi heatmap.</p>
+    </div>
+    <div class="save-actions">
+      <button type="button" class="secondary-button" (click)="loadLayout()">Load layout</button>
+      <button type="button" class="primary-button" (click)="saveLayout()">Save layout</button>
+    </div>
+  </header>
+
+  <div class="editor-layout">
+    <section class="canvas-card" aria-label="Floor plan editor">
+      <div class="toolbar">
+        <div class="tool-group" aria-label="Editor tools">
+          <button type="button" [class.selected]="tool() === 'select'" (click)="tool.set('select')">
+            Select / move
+          </button>
+          <button type="button" [class.selected]="tool() === 'wall'" (click)="tool.set('wall')">
+            Draw wall
+          </button>
+        </div>
+        @if (tool() === 'wall') {
+          <label class="wall-type">
+            Material
+            <select id="wall-material" [value]="wallType()" (change)="onWallTypeChange($event)">
+              <option value="drywall">Drywall · 3 dB</option>
+              <option value="wood">Wood · 4 dB</option>
+              <option value="brick">Brick · 8 dB</option>
+              <option value="concrete">Concrete · 15 dB</option>
+            </select>
+          </label>
+        }
+        <button type="button" class="secondary-button mesh-button" (click)="addMeshNode()">Add mesh node</button>
+      </div>
+
+      <app-coverage-canvas
+        [floorPlan]="floorPlan()"
+        [editable]="true"
+        [tool]="tool()"
+        [wallType]="wallType()"
+        (deviceMoved)="wifi.moveDevice($event.id, $event.x, $event.y)"
+        (wallCreated)="wifi.addWall($event)"
+      />
+
+      <div class="legend" aria-label="Estimated signal strength legend">
+        <span><i class="excellent"></i> Excellent · −50 dBm or better</span>
+        <span><i class="good"></i> Good · −60 to −51 dBm</span>
+        <span><i class="fair"></i> Fair · −70 to −61 dBm</span>
+        <span><i class="weak"></i> Weak · −80 to −71 dBm</span>
+        <span><i class="poor"></i> Poor · below −80 dBm</span>
+      </div>
+      <p class="estimate-note">Heatmap is an estimate based on distance and wall material, not a live measurement.</p>
+    </section>
+
+    <aside class="side-panel">
+      <section class="panel-card">
+        <h2>Devices</h2>
+        <ul class="device-list">
+          @for (device of floorPlan().devices; track device.id) {
+            <li>
+              <span class="device-dot" [class.mesh]="device.type === 'mesh'"></span>
+              <span>{{ device.name }}</span>
+              <small>{{ device.x }}, {{ device.y }}</small>
+            </li>
+          }
+        </ul>
+        <p class="panel-hint">Drag a device on the map to move it.</p>
+      </section>
+
+      <section class="panel-card">
+        <h2>Walls <span class="count">{{ floorPlan().walls.length }}</span></h2>
+        @if (floorPlan().walls.length === 0) {
+          <p class="panel-hint">Choose Draw wall, then drag across the map to add an obstacle.</p>
+        } @else {
+          <ul class="wall-list">
+            @for (wall of floorPlan().walls; track wall.id) {
+              <li>
+                <span>{{ wall.type }} <small>−{{ wall.attenuation }} dB</small></span>
+                <button type="button" class="remove-button" [attr.aria-label]="'Remove ' + wall.type + ' wall'" (click)="removeWall(wall.id)">Remove</button>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <p class="status-message" role="status" aria-live="polite">{{ status() }}</p>
+    </aside>
+  </div>
+</section>

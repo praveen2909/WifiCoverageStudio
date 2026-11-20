@@ -1,0 +1,37 @@
+<section class="coverage-page">
+  <header>
+    <p class="eyebrow">ESTIMATED COVERAGE</p>
+    <h1>Wi-Fi coverage map</h1>
+    <p>Signal strength is estimated from your router, mesh-node, and wall layout.</p>
+  </header>
+
+  <section class="map-card" aria-label="Estimated Wi-Fi coverage heatmap">
+    <div class="range-control">
+      <label for="coverage-range">Maximum modeled range</label>
+      <div class="range-input">
+        <input
+          id="coverage-range"
+          type="range"
+          min="1"
+          max="50"
+          step="1"
+          [value]="rangeMeters()"
+          [attr.aria-valuetext]="rangeMeters() + ' meters'"
+          (input)="onRangeChange($event)"
+        />
+        <output for="coverage-range">{{ rangeMeters() }} m</output>
+      </div>
+      <p>Adjust the modeled radius around each access point. Signal quality is still estimated from distance and walls.</p>
+    </div>
+    <app-coverage-canvas [floorPlan]="floorPlan()" [rangeMeters]="rangeMeters()" />
+    <div class="legend">
+      <span><i class="excellent"></i> Excellent · −50 dBm or better</span>
+      <span><i class="good"></i> Good · −60 to −51 dBm</span>
+      <span><i class="fair"></i> Fair · −70 to −61 dBm</span>
+      <span><i class="weak"></i> Weak · −80 to −71 dBm</span>
+      <span><i class="poor"></i> Poor · below −80 dBm</span>
+      <span><i class="outside-range"></i> Outside selected range</span>
+    </div>
+    <p class="disclaimer">The selected range is a visual planning limit, not a measured router specification. Edit the floor plan to move devices or add walls.</p>
+  </section>
+</section>

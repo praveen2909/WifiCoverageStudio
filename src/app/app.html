@@ -1,0 +1,15 @@
+<mat-toolbar class="app-toolbar">
+  <a class="brand" routerLink="/dashboard">WiFi Coverage Studio</a>
+  <nav aria-label="Main navigation">
+    <a mat-button routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a mat-button routerLink="/coverage-map" routerLinkActive="active">Coverage map</a>
+    <a mat-button routerLink="/wifi-monitor" routerLinkActive="active">Wi-Fi monitor</a>
+    <a mat-button routerLink="/floor-plan" routerLinkActive="active">Floor plan</a>
+    <a mat-button routerLink="/mesh-simulator" routerLinkActive="active">Mesh simulator</a>
+    <a mat-button routerLink="/settings" routerLinkActive="active">Settings</a>
+  </nav>
+</mat-toolbar>
+
+<main class="app-content">
+  <router-outlet />
+</main>
