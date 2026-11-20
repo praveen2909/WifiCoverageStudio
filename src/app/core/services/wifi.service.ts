@@ -103,6 +103,12 @@ export class WifiService {
       (typeof reading['ssid'] === 'string' || reading['ssid'] === null) &&
       (typeof reading['rssiDbm'] === 'number' || reading['rssiDbm'] === null) &&
       (typeof reading['channel'] === 'number' || reading['channel'] === null) &&
+      (typeof reading['routerIp'] === 'string' ||
+        reading['routerIp'] === null ||
+        reading['routerIp'] === undefined) &&
+      (typeof reading['routerIpError'] === 'string' ||
+        reading['routerIpError'] === null ||
+        reading['routerIpError'] === undefined) &&
       (typeof reading['timestamp'] === 'string' || reading['timestamp'] === null) &&
       (typeof reading['error'] === 'string' || reading['error'] === null)
     );

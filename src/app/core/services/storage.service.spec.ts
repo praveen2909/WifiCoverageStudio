@@ -63,4 +63,23 @@ describe('StorageService', () => {
 
     expect(() => service.loadFloorPlan()).toThrow('Saved floor plan data is invalid.');
   });
+
+  it('saves and restores distance calibration locally', () => {
+    const calibration = { distanceMeters: 20, rssiDbm: -56 };
+
+    service.saveDistanceCalibration(calibration);
+
+    expect(service.loadDistanceCalibration()).toEqual(calibration);
+    service.clearDistanceCalibration();
+    expect(service.loadDistanceCalibration()).toBeNull();
+  });
+
+  it('rejects unsupported calibration values', () => {
+    expect(() => service.saveDistanceCalibration({ distanceMeters: 0, rssiDbm: -56 })).toThrow(
+      'Distance calibration values are outside the supported range.',
+    );
+    expect(() => service.saveDistanceCalibration({ distanceMeters: 20, rssiDbm: -121 })).toThrow(
+      'Distance calibration values are outside the supported range.',
+    );
+  });
 });

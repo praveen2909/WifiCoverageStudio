@@ -29,6 +29,16 @@ describe('CoverageService', () => {
     expect(service.getEstimatedDistance(Number.NaN)).toBeNull();
   });
 
+  it('anchors estimated distance to a user-provided calibration point', () => {
+    const calibration = { distanceMeters: 20, rssiDbm: -56 };
+
+    expect(service.getEstimatedDistance(-56, calibration)).toBe(20);
+    expect(service.getEstimatedDistance(-56 - 27, calibration)).toBeCloseTo(200, 8);
+    expect(
+      service.getEstimatedDistance(-56, { distanceMeters: 0, rssiDbm: -56 }),
+    ).toBeNull();
+  });
+
   it('checks whether a point is within range of any access point', () => {
     expect(service.isWithinRange(100, 0, [router], 5, 0.05)).toBe(true);
     expect(service.isWithinRange(101, 0, [router], 5, 0.05)).toBe(false);

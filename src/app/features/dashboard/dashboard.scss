@@ -124,6 +124,69 @@
   font-size: 0.82rem;
 }
 
+.calibration-controls {
+  display: grid;
+  gap: 0.55rem;
+  padding: 1rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container-low);
+}
+
+.calibration-controls > label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.calibration-input-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.calibration-input-row input {
+  width: 7rem;
+  min-height: 2.5rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: inherit;
+}
+
+.calibration-input-row > span {
+  margin-right: auto;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.85rem;
+}
+
+.provider-button,
+.reset-button {
+  min-height: 2.5rem;
+  border-radius: 0.55rem;
+  padding: 0.5rem 0.8rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.reset-button {
+  border: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+.calibration-status,
+.provider-status {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.calibration-status {
+  color: var(--mat-sys-primary);
+}
+
 .provider-card {
   display: flex;
   align-items: center;
@@ -142,21 +205,12 @@
   line-height: 1.5;
 }
 
-.provider-card a {
-  color: var(--mat-sys-primary);
-}
-
 .provider-button {
   flex: 0 0 auto;
-  min-height: 2.5rem;
   border: 1px solid var(--mat-sys-primary);
-  border-radius: 0.55rem;
-  padding: 0.5rem 0.8rem;
   background: var(--mat-sys-primary);
   color: var(--mat-sys-on-primary);
-  font: inherit;
   font-weight: 600;
-  cursor: pointer;
 }
 
 .provider-button:disabled {
@@ -166,9 +220,7 @@
 
 .provider-status {
   flex-basis: 100%;
-  margin: 0;
   color: var(--mat-sys-on-surface-variant);
-  font-size: 0.82rem;
 }
 
 .quick-actions {

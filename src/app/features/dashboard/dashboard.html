@@ -18,18 +18,26 @@
   <section class="network-card" aria-labelledby="network-title">
     <div class="card-heading">
       <div>
-        <p class="eyebrow">CONNECTED WI-FI</p>
+        <p class="eyebrow">CONNECTED ROUTER</p>
         <h2 id="network-title">
           @if (!wifi.companionConnected()) {
             Waiting for companion
-          } @else if (wifi.reading()?.connected && !wifi.reading()?.ssid) {
-            Network name unavailable
           } @else if (wifi.reading()?.connected) {
-            {{ wifi.reading()?.ssid }}
+            Router / gateway
           } @else {
             No Wi-Fi connection
           }
         </h2>
+        @if (wifi.reading()?.connected) {
+          <p class="router-ip sample-note">
+            Gateway IP:
+            @if (wifi.reading()?.routerIp) {
+              <strong>{{ wifi.reading()?.routerIp }}</strong>
+            } @else {
+              <span>{{ wifi.reading()?.routerIpError || 'Unavailable' }}</span>
+            }
+          </p>
+        }
       </div>
       @if (wifi.reading()?.connected && wifi.reading()?.channel) {
         <span class="band">Channel {{ wifi.reading()?.channel }}</span>
@@ -48,11 +56,45 @@
       <span [style.width.%]="signalPercent()"></span>
     </div>
     @if (estimatedDistance(); as distance) {
-      <app-distance-graphic [meters]="distance" />
+      <app-distance-graphic [meters]="distance" [calibrated]="distanceCalibration() !== null" />
+      <div class="calibration-controls">
+        <label for="known-distance">Known distance from access point</label>
+        <div class="calibration-input-row">
+          <input
+            id="known-distance"
+            type="number"
+            min="0.1"
+            max="1000"
+            step="0.1"
+            [value]="knownDistanceMeters()"
+            (input)="onKnownDistanceInput($event)"
+          />
+          <span>meters</span>
+          <button type="button" class="provider-button" (click)="calibrateDistance()">
+            Calibrate from current signal
+          </button>
+          @if (distanceCalibration()) {
+            <button type="button" class="reset-button" (click)="resetDistanceCalibration()">
+              Reset
+            </button>
+          }
+        </div>
+        <p class="sample-note">
+          @if (distanceCalibration()) {
+            Current calibration: {{ distanceCalibration()?.distanceMeters }} m at
+            {{ distanceCalibration()?.rssiDbm }} dBm. Stored only in this browser.
+          } @else {
+            Enter your known distance and calibrate while this live signal reading is current.
+          }
+        </p>
+        @if (distanceCalibrationStatus()) {
+          <p class="calibration-status" role="status" aria-live="polite">
+            {{ distanceCalibrationStatus() }}
+          </p>
+        }
+      </div>
     }
-    @if (wifi.reading()?.error) {
-      <p class="sample-note">{{ wifi.reading()?.error }}</p>
-    } @else if (wifi.reading()?.connected && wifi.reading()?.timestamp) {
+    @if (wifi.reading()?.connected && wifi.reading()?.timestamp) {
       <p class="sample-note">Live reading · updated {{ wifi.reading()?.timestamp | date:'mediumTime' }}</p>
     } @else {
       <p class="sample-note">

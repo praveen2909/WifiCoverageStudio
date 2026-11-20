@@ -1,15 +1,33 @@
 import { Injectable } from '@angular/core';
-import { WifiDevice, Wall, SignalQuality } from '../models/wifi.models';
+import { DistanceCalibration, WifiDevice, Wall, SignalQuality } from '../models/wifi.models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CoverageService {
-  getEstimatedDistance(rssiDbm: number): number | null {
+  getEstimatedDistance(
+    rssiDbm: number,
+    calibration: DistanceCalibration | null = null,
+  ): number | null {
     if (!Number.isFinite(rssiDbm)) return null;
 
-    const referenceRssiAtOneMeter = -40;
     const indoorPathLossExponent = 2.7;
+    if (calibration) {
+      if (
+        !Number.isFinite(calibration.distanceMeters) ||
+        calibration.distanceMeters <= 0 ||
+        !Number.isFinite(calibration.rssiDbm)
+      ) {
+        return null;
+      }
+
+      return (
+        calibration.distanceMeters *
+        10 ** ((calibration.rssiDbm - rssiDbm) / (10 * indoorPathLossExponent))
+      );
+    }
+
+    const referenceRssiAtOneMeter = -40;
     return 10 ** ((referenceRssiAtOneMeter - rssiDbm) / (10 * indoorPathLossExponent));
   }
 

@@ -11,9 +11,11 @@ npm start
 
 Open `http://localhost:4200/`. Routes are available for the dashboard, coverage map, Wi-Fi monitor, floor plan, mesh simulator, and settings.
 
-The dashboard reads the active SSID and signal strength in dBm from the local macOS companion. When RSSI is available, it also shows a rough access-point distance estimate assuming -40 dBm at 1 m and typical indoor signal loss. This is not a measured distance: walls, router transmit power, and the connected access point can significantly affect the result. It displays an unavailable state rather than invented values when the service or a live reading is missing. The companion requests macOS Location Services permission because macOS restricts access to the Wi-Fi network name; allow it when prompted.
+The dashboard reads signal strength in dBm and the local default gateway IP from the macOS companion. It labels the gateway as the router; macOS does not reliably expose the router's hardware/model name. The SSID is not shown. When RSSI is available, the dashboard also shows a rough access-point distance estimate assuming -40 dBm at 1 m and typical indoor signal loss. This is not a measured distance: walls, router transmit power, and the connected access point can significantly affect the result.
 
 The optional **Look up provider** dashboard action calls the local companion, which sends the request to [IPinfo Lite](https://ipinfo.io/lite) only after you click. IPinfo receives the public IP address and returns ASN organization data; this is an estimate of the network owner, not the Wi-Fi SSID or always the retail ISP. The Angular app never receives the IPinfo token.
+
+The dashboard distance graphic uses a rough indoor RSSI model by default. To calibrate it, enter a known access-point distance (for example, 20 m) while at that location and select **Calibrate from current signal**. The browser stores that distance and current RSSI locally. Future distance values are estimates anchored to that point; changing rooms, band, router power, or obstacles can still affect accuracy.
 
 Create a free IPinfo account and provide its token to the companion process as an environment variable:
 
@@ -31,7 +33,7 @@ npm run build
 npm start
 ```
 
-In another terminal, start the Angular app with `npm start`. The dashboard polls the companion every two seconds at `127.0.0.1:8765`. The companion binds to loopback and accepts browser requests only from the local Angular development origin. If macOS does not show the permission prompt or Location Services is turned off automatically, enable it for **WiFi Coverage Studio Companion** under **System Settings → Privacy & Security → Location Services**, then restart the companion. Rebuilding an unsigned app with a new ad-hoc signature can also cause macOS to reset TCC permissions; for a permanent installation, sign the app with one stable Developer ID or Apple Development identity before distribution. The current native reader supports macOS; Windows and Linux readers are not implemented yet.
+In another terminal, start the Angular app with `npm start`. The dashboard polls the companion every two seconds at `127.0.0.1:8765`. The companion binds to loopback, reads the local default gateway using macOS's route table, and accepts browser requests only from the local Angular development origin. The gateway IP is local network information and is not sent to an external provider. Rebuilding an unsigned app with a new ad-hoc signature can reset macOS permissions; for a permanent installation, sign the app with one stable Developer ID or Apple Development identity before distribution. The current native reader supports macOS; Windows and Linux readers are not implemented yet.
 
 The build ad-hoc signs the complete app bundle if `CODESIGN_IDENTITY` is not set. Ad-hoc signatures are tied to the build's code hash, so rebuilding can make macOS disable/forget the Location Services grant. For a stable grant, install an Apple Development or Developer ID signing certificate in the login keychain, then build with its exact identity:
 

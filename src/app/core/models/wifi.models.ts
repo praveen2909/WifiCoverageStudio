@@ -33,6 +33,11 @@ export interface MeasurementPoint {
   timestamp: Date;
 }
 
+export interface DistanceCalibration {
+  distanceMeters: number;
+  rssiDbm: number;
+}
+
 export interface FloorPlan {
   width: number;
   height: number;

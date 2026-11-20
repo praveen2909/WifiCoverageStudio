@@ -8,7 +8,9 @@ import { Component, computed, input } from '@angular/core';
     <section class="distance-card" aria-labelledby="distance-title">
       <div class="distance-heading">
         <div>
-          <p class="eyebrow">ESTIMATED ACCESS POINT DISTANCE</p>
+          <p class="eyebrow">
+            {{ calibrated() ? 'CALIBRATED DISTANCE ESTIMATE' : 'ESTIMATED ACCESS POINT DISTANCE' }}
+          </p>
           <h3 id="distance-title">Approximate distance</h3>
         </div>
         <strong class="distance-value">~{{ meters() | number: '1.1-1' }} <span>m</span></strong>
@@ -48,8 +50,9 @@ import { Component, computed, input } from '@angular/core';
         <text x="300" y="160" text-anchor="middle" class="distance-axis-label">Estimated distance (m)</text>
       </svg>
       <p class="disclaimer">
-        Derived from RSSI—not GPS or device positioning. Walls, router power, band, and interference
-        can make the real distance differ significantly.
+        {{ calibrated()
+          ? 'Anchored to your known distance and current RSSI. Changes remain estimates and depend on similar walls, band, router power, and interference.'
+          : 'Derived from RSSI—not GPS or device positioning. Walls, router power, band, and interference can make the real distance differ significantly.' }}
       </p>
     </section>
   `,
@@ -176,6 +179,7 @@ import { Component, computed, input } from '@angular/core';
 })
 export class DistanceGraphic {
   readonly meters = input.required<number>();
+  readonly calibrated = input(false);
 
   protected readonly scaleMeters = computed(() => this.getNiceScale(this.meters() * 1.12));
   protected readonly markerX = computed(() => 72 + (this.meters() / this.scaleMeters()) * 456);

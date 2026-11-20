@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { getRouterInfo } from './router-info.mjs';
 
 const host = '127.0.0.1';
 const port = Number(process.env.COMPANION_PORT ?? 8765);
@@ -31,6 +32,30 @@ let latestReading = {
   timestamp: null,
   error: 'Waiting for the macOS Wi-Fi reader to start.',
 };
+let routerInfoCache = null;
+let routerInfoExpiresAt = 0;
+let routerInfoRequest = null;
+
+async function getCachedRouterInfo() {
+  if (routerInfoCache && Date.now() < routerInfoExpiresAt) {
+    return routerInfoCache;
+  }
+  if (routerInfoRequest) {
+    return routerInfoRequest;
+  }
+
+  routerInfoRequest = getRouterInfo()
+    .then((info) => {
+      routerInfoCache = info;
+      routerInfoExpiresAt = Date.now() + 10_000;
+      return info;
+    })
+    .finally(() => {
+      routerInfoRequest = null;
+    });
+
+  return routerInfoRequest;
+}
 
 function updateReading(value) {
   const valid =
@@ -190,12 +215,14 @@ const server = createServer((request, response) => {
   }
 
   if (request.method === 'GET' && request.url === '/api/v1/wifi/current') {
-    response.writeHead(200, {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
+    void getCachedRouterInfo().then((routerInfo) => {
+      response.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+      });
+      response.end(JSON.stringify({ ...latestReading, ...routerInfo }));
     });
-    response.end(JSON.stringify(latestReading));
     return;
   }
 

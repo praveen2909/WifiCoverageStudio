@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { FloorPlan, MeasurementPoint } from '../models/wifi.models';
+import { DistanceCalibration, FloorPlan, MeasurementPoint } from '../models/wifi.models';
 
 const FLOOR_PLAN_STORAGE_KEY = 'wifi-coverage-studio.floor-plan';
+const DISTANCE_CALIBRATION_STORAGE_KEY = 'wifi-coverage-studio.distance-calibration';
 
 interface StoredFloorPlan extends Omit<FloorPlan, 'measurements'> {
   measurements: Array<Omit<MeasurementPoint, 'timestamp'> & { timestamp: string }>;
@@ -43,6 +44,52 @@ export class StorageService {
 
   clearFloorPlan(): void {
     localStorage.removeItem(FLOOR_PLAN_STORAGE_KEY);
+  }
+
+  saveDistanceCalibration(calibration: DistanceCalibration): void {
+    if (
+      !Number.isFinite(calibration.distanceMeters) ||
+      calibration.distanceMeters <= 0 ||
+      calibration.distanceMeters > 1000 ||
+      !Number.isFinite(calibration.rssiDbm) ||
+      calibration.rssiDbm < -120 ||
+      calibration.rssiDbm > 0
+    ) {
+      throw new Error('Distance calibration values are outside the supported range.');
+    }
+
+    localStorage.setItem(DISTANCE_CALIBRATION_STORAGE_KEY, JSON.stringify(calibration));
+  }
+
+  loadDistanceCalibration(): DistanceCalibration | null {
+    const value = localStorage.getItem(DISTANCE_CALIBRATION_STORAGE_KEY);
+    if (value === null) return null;
+
+    const calibration: unknown = JSON.parse(value);
+    if (
+      typeof calibration !== 'object' ||
+      calibration === null ||
+      !this.isFiniteNumber((calibration as Record<string, unknown>)['distanceMeters']) ||
+      !this.isFiniteNumber((calibration as Record<string, unknown>)['rssiDbm'])
+    ) {
+      throw new Error('Saved distance calibration data is invalid.');
+    }
+
+    const validCalibration = calibration as DistanceCalibration;
+    if (
+      validCalibration.distanceMeters <= 0 ||
+      validCalibration.distanceMeters > 1000 ||
+      validCalibration.rssiDbm < -120 ||
+      validCalibration.rssiDbm > 0
+    ) {
+      throw new Error('Saved distance calibration data is outside the supported range.');
+    }
+
+    return validCalibration;
+  }
+
+  clearDistanceCalibration(): void {
+    localStorage.removeItem(DISTANCE_CALIBRATION_STORAGE_KEY);
   }
 
   private isStoredFloorPlan(value: unknown): value is StoredFloorPlan {

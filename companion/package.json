@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "mkdir -p bin/WiFiCoverageStudioCompanion.app/Contents/MacOS && swiftc -O -framework CoreWLAN -framework CoreLocation -o bin/WiFiCoverageStudioCompanion.app/Contents/MacOS/wifi-reader wifi-reader.swift && cp Info.plist bin/WiFiCoverageStudioCompanion.app/Contents/Info.plist && node sign-app.mjs",
+    "test": "node --test",
     "start": "node server.mjs"
   }
 }
