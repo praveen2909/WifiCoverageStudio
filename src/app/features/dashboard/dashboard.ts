@@ -26,6 +26,14 @@ export class Dashboard {
   protected readonly distanceCalibration = signal<DistanceCalibration | null>(null);
   protected readonly knownDistanceMeters = signal('20');
   protected readonly distanceCalibrationStatus = signal<string | null>(null);
+  protected readonly routerName = computed(() => {
+    const reading = this.wifi.reading();
+    if (!reading?.connected) return null;
+
+    return reading.routerIp === '192.168.31.1'
+      ? 'Likely Xiaomi / Mi Router'
+      : 'Router / gateway';
+  });
   protected readonly signalQuality = computed(() => {
     const rssi = this.wifi.reading()?.rssiDbm;
     return rssi === null || rssi === undefined ? null : this.coverage.getSignalQuality(rssi);

@@ -23,12 +23,15 @@
           @if (!wifi.companionConnected()) {
             Waiting for companion
           } @else if (wifi.reading()?.connected) {
-            Router / gateway
+            {{ routerName() }}
           } @else {
             No Wi-Fi connection
           }
         </h2>
         @if (wifi.reading()?.connected) {
+          @if (wifi.reading()?.routerIp === '192.168.31.1') {
+            <p class="sample-note">Likely brand based on this gateway’s common default IP; the router model is not verified.</p>
+          }
           <p class="router-ip sample-note">
             Gateway IP:
             @if (wifi.reading()?.routerIp) {

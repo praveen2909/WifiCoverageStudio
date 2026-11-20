@@ -11,7 +11,7 @@ npm start
 
 Open `http://localhost:4200/`. Routes are available for the dashboard, coverage map, Wi-Fi monitor, floor plan, mesh simulator, and settings.
 
-The dashboard reads signal strength in dBm and the local default gateway IP from the macOS companion. It labels the gateway as the router; macOS does not reliably expose the router's hardware/model name. The SSID is not shown. When RSSI is available, the dashboard also shows a rough access-point distance estimate assuming -40 dBm at 1 m and typical indoor signal loss. This is not a measured distance: walls, router transmit power, and the connected access point can significantly affect the result.
+The dashboard reads signal strength in dBm and the local default gateway IP from the macOS companion. It labels `192.168.31.1` as a likely Xiaomi/Mi router because that address is commonly used by Xiaomi routers by default; this is only an IP-based guess, not a verified make or model. Other gateway addresses are labeled generically. The SSID is not shown. When RSSI is available, the dashboard also shows a rough access-point distance estimate assuming -40 dBm at 1 m and typical indoor signal loss. This is not a measured distance: walls, router transmit power, and the connected access point can significantly affect the result.
 
 The optional **Look up provider** dashboard action calls the local companion, which sends the request to [IPinfo Lite](https://ipinfo.io/lite) only after you click. IPinfo receives the public IP address and returns ASN organization data; this is an estimate of the network owner, not the Wi-Fi SSID or always the retail ISP. The Angular app never receives the IPinfo token.
 
